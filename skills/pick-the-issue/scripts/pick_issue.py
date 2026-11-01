@@ -11,6 +11,7 @@ summarize its scope, and recommend the exact skills and commands to proceed.
 """
 
 import argparse
+import datetime
 import json
 import os
 import re
@@ -62,29 +63,62 @@ def get_org_repos(org: str) -> List[str]:
 
 def get_active_t3_threads(custom_threads: Optional[List[str]] = None) -> List[Dict[str, Any]]:
     threads = []
+    seen_ids = set()
+
     if custom_threads:
         for t in custom_threads:
-            threads.append({"title": t, "status": "running"})
+            threads.append({"title": t, "status": "custom"})
         return threads
 
     if os.path.exists(T3_SQLITE_PATH):
         try:
             conn = sqlite3.connect(f"file:{T3_SQLITE_PATH}?mode=ro", uri=True)
             cursor = conn.cursor()
-            query = """
+
+            # 1. Any run currently active (running / queued / waiting)
+            query_runs = """
             SELECT r.thread_id, t.title, r.status, r.requested_at
             FROM orchestration_v2_projection_runs r
             JOIN orchestration_v2_projection_threads t ON r.thread_id = t.thread_id
             WHERE r.completed_at IS NULL AND r.status IN ('running', 'starting', 'queued', 'waiting')
             ORDER BY r.requested_at DESC
             """
-            for row in cursor.execute(query):
+            for row in cursor.execute(query_runs):
+                seen_ids.add(row[0])
                 threads.append({
                     "thread_id": row[0],
                     "title": row[1],
                     "status": row[2],
-                    "requested_at": row[3],
+                    "updated_at": row[3],
                 })
+
+            # 2. Any non-archived, non-deleted thread updated in the past 6 hours
+            query_recent = """
+            SELECT thread_id, title, updated_at
+            FROM orchestration_v2_projection_threads
+            WHERE archived_at IS NULL AND deleted_at IS NULL
+            ORDER BY updated_at DESC
+            LIMIT 25
+            """
+            cutoff = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=6)
+            for row in cursor.execute(query_recent):
+                tid, title, updated_at = row[0], row[1], row[2]
+                if tid in seen_ids:
+                    continue
+                try:
+                    # e.g. 2026-11-01T07:31:15.289Z
+                    dt = datetime.datetime.fromisoformat(updated_at.replace("Z", "+00:00"))
+                    if dt >= cutoff:
+                        threads.append({
+                            "thread_id": tid,
+                            "title": title,
+                            "status": "active_session",
+                            "updated_at": updated_at,
+                        })
+                        seen_ids.add(tid)
+                except Exception:
+                    pass
+
             conn.close()
         except Exception:
             pass
