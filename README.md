@@ -1,6 +1,6 @@
-# Trajectonomics Lab Internal Skills
+# Trajectonomics Internal Skills
 
-Internal AI coding agent skills for the Trajectonomics Lab ecosystem, managed via [skills.sh](https://skills.sh/) (`npx skills`).
+Internal AI coding agent skills for the Trajectonomics ecosystem, managed via [skills.sh](https://skills.sh/) (`npx skills`).
 
 ## Available Skills
 
@@ -12,7 +12,7 @@ Install into any Trajectonomics repository using the `skills` CLI:
 
 ```bash
 # Add to the current repository
-npx skills add trajectonomics-lab/internal-skills -y
+npx skills add trajectonomics/internal-skills -y
 
 # Update to latest version
 npx skills update -p -y

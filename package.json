@@ -1,10 +1,10 @@
 {
-  "name": "@trajectonomics-lab/internal-skills",
+  "name": "@trajectonomics/internal-skills",
   "version": "0.1.0",
-  "description": "Internal AI coding agent skills for Trajectonomics Lab",
+  "description": "Internal AI coding agent skills for Trajectonomics",
   "repository": {
     "type": "git",
-    "url": "https://github.com/trajectonomics-lab/internal-skills.git"
+    "url": "https://github.com/trajectonomics/internal-skills.git"
   },
   "license": "MIT",
   "private": false
