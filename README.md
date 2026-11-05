@@ -4,7 +4,7 @@ Internal AI coding agent skills for the Trajectonomics ecosystem, managed via [s
 
 ## Available Skills
 
-- **`pick-the-issue`**: Discovers open GitHub issues across the repository or organization, filters out blocked issues and issues actively handled by existing T3 Code sessions, provides an executive summary, and routes the work through Matt Pocock's skills framework (`ask-matt`) to advise on the exact commands and workflow.
+- **`pick-the-issue`**: Discovers open GitHub issues in the current repository only, filters out blocked issues and issues actively handled by existing T3 Code sessions, provides an executive summary, and routes the work through Matt Pocock's skills framework (`ask-matt`) to advise on the exact commands and workflow.
 
 ## Installation
 
